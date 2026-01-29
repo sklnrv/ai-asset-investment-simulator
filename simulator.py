@@ -41,9 +41,21 @@ def run_strategy(prices, capital=100000):
 # ---- DATA LOADING ----
 def load_market_data():
     """
-    Placeholder for real market data.
+    Monthly returns based on real Nasdaq-100 historical data.
+    Source: Investing.com
+    Period: Apr 2025 – Jan 2026
     """
-    return [0.02, -0.01, 0.03, 0.015, -0.02]
+    return [
+        0.0904,
+        0.0627,
+        0.0238,
+        0.0085,
+        0.0540,
+        0.0477,
+        -0.0164,
+        -0.0073,
+        0.0306
+    ]
 
 
 # ---- STRATEGY LOGIC ----
