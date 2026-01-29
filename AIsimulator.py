@@ -50,7 +50,7 @@ def predict_future_range(df, days_to_predict=15):
 
 if __name__ == "__main__":
     print("\n" + "="*40)
-    print("   QUANT AI PREDICTOR - V1.0 FINAL")
+    print("   AI ASSET INVESTMENT SIMULATOR - V1.0")
     print("="*40)
     
     ticker = input("Introduce el ticker (ej: BTC-USD, NVDA, AAPL): ").upper() or "NVDA"
