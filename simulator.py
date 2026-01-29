@@ -1,74 +1,65 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from datetime import datetime, timedelta
+from sklearn.linear_model import LinearRegression
 from data_provider import get_prices
-import random
 
-"""
-Quant Investment Simulator
+def predict_prices(prices, days_to_predict=7):
+    """Usa Machine Learning para predecir los precios de la próxima semana."""
+    # Preparamos los datos (usamos los últimos 30 días para entrenar)
+    y = np.array(prices[-30:]).reshape(-1, 1)
+    X = np.array(range(len(y))).reshape(-1, 1)
+    
+    # Entrenamos el modelo de Regresión Lineal
+    model = LinearRegression()
+    model.fit(X, y)
+    
+    # Predecimos el futuro
+    future_X = np.array(range(len(y), len(y) + days_to_predict)).reshape(-1, 1)
+    predictions = model.predict(future_X)
+    
+    return predictions.flatten()
 
-This script simulates the growth of an investment over time
-using real market data and moving average strategies.
-"""
+def plot_with_prediction(ticker, prices, predictions):
+    """Grafica el pasado y la predicción futura."""
+    plt.figure(figsize=(12, 6))
+    
+    # Precios pasados (últimos 30 días para que se vea claro)
+    past_days = list(range(len(prices[-30:])))
+    plt.plot(past_days, prices[-30:], label="Precio Real (Últimos 30d)", color="blue", linewidth=2)
+    
+    # Predicción futura
+    future_days = list(range(len(past_days), len(past_days) + len(predictions)))
+    # Unimos el último punto real con el primero de la predicción para que no haya hueco
+    plt.plot([past_days[-1]] + future_days, [prices[-1]] + list(predictions), 
+             label="Predicción IA (7 días)", color="red", linestyle="--", marker='o')
+    
+    plt.title(f"Predicción de Tendencia con Machine Learning: {ticker}")
+    plt.xlabel("Días (Tiempo)")
+    plt.ylabel("Precio ($)")
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.show()
 
-# ---- FUNCIONES DE SIMULACIÓN Y ESTRATEGIA ----
-
-def simulate_market(days=200, start_price=10000):
-    prices = [start_price]
-    for _ in range(days - 1):
-        prices.append(prices[-1] * (1 + random.uniform(-0.02, 0.02)))
-    return prices
-
-def moving_average(data, window):
-    return sum(data[-window:]) / window if len(data) >= window else None
-
-def run_strategy(prices, capital=100000):
-    cash = capital
-    shares = 0
-
-    for day in range(20, len(prices)):
-        short = moving_average(prices[:day], 5)
-        long = moving_average(prices[:day], 20)
-        price = prices[day]
-
-        if short and long:
-            if short > long and cash > 0:
-                shares = cash / price
-                cash = 0
-            elif short < long and shares > 0:
-                cash = shares * price
-                shares = 0
-
-    return cash + shares * prices[-1]
-
-# ---- DATA LOADING (ANTIGUO) ----
-def load_market_data():
-    """
-    Monthly returns based on real Nasdaq-100 historical data.
-    """
-    return [
-        0.0904, 0.0627, 0.0238, 0.0085, 0.0540, 
-        0.0477, -0.0164, -0.0073, 0.0306
-    ]
-
-# ---- STRATEGY LOGIC (ANTIGUO) ----
-def apply_strategy(returns, initial_capital):
-    capital = initial_capital
-    for r in returns:
-        capital *= (1 + r)
-    return capital
-
-
-# ---- MAIN EXECUTION (ACTUALIZADO) ----
 if __name__ == "__main__":
-    initial_capital = 100000
-
-    # Obtenemos los datos en tiempo real/históricos
-    prices = get_prices(
-        asset="^NDX",
-        start_date="2023-01-01",
-        end_date="2024-01-01"
-    )
-
-    # Ejecutamos la estrategia usando los precios obtenidos
-    final_capital = run_strategy(prices, initial_capital)
-
-    print("Final capital:", round(final_capital, 2))
-    print("Final capital:", round(final_capital, 2))
+    print("\n=== AI QUANT FORECASTER ===")
+    ticker = input("Ticker para predecir (ej: BTC-USD, NVDA): ").upper() or "NVDA"
+    
+    # Obtenemos datos de los últimos meses
+    hoy = datetime.now()
+    inicio = (hoy - timedelta(days=60)).strftime('%Y-%m-%d')
+    fin = hoy.strftime('%Y-%m-%d')
+    
+    prices = get_prices(ticker, inicio, fin)
+    
+    if prices:
+        print(f"Entrenando modelo para {ticker}...")
+        preds = predict_prices(prices)
+        
+        print("\n--- PREDICCIÓN PARA LA PRÓXIMA SEMANA ---")
+        for i, p in enumerate(preds, 1):
+            print(f"Día {i}: ${p:,.2f}")
+            
+        plot_with_prediction(ticker, prices, preds)
+    else:
+        print("No se pudieron obtener datos.")
