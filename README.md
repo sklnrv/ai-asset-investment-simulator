@@ -30,7 +30,7 @@ Accede instantáneamente sin instalar nada a través de nuestra plataforma en la
 ---
 
 ### Opción B: Ejecución Local (Windows)
-1. Descarga el proyecto desde **[Releases](https://github.com/sklnrv/QuantVisionAI/releases/tag/1.0.0)**.
+1. Descarga el proyecto desde **[Releases](https://github.com/sklnrv/QuantVisionAI/archive/refs/tags/1.0.0.zip)**.
 2. Descomprime y ejecuta `INICIAR_ANALIZADOR.vbs`.
    * *Si no tienes Python, el asistente te abrirá automáticamente la Microsoft Store para instalarlo.*
 
